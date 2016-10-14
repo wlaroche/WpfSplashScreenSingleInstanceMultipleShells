@@ -2,28 +2,15 @@
 using SimpleInjector;
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Input;
 using WpfSplashScreen.Helpers;
+using WpfSplashScreen.Infrastructure.Interfaces.Services;
+using WpfSplashScreen.Infrastructure.Interfaces.ViewModels;
+using WpfSplashScreen.Infrastructure.Interfaces.Views;
 using WpfSplashScreen.Models.Enums;
-using WpfSplashScreen.Models.Events;
-using WpfSplashScreen.Services;
-using WpfSplashScreen.Views;
 
 namespace WpfSplashScreen.ViewModels
 {
-    public interface IShellWindowViewModel
-    {
-        IShellWindowView View { get; set; }
-
-        void Initialize();
-
-        void ProcessArgs(IList<string> args);
-
-        bool CanExit();
-    }
-
     public class ShellWindowViewModel : WpfSplashScreen.ViewModels.ViewModelBase, IShellWindowViewModel
     {
         private string _instanceId = Guid.NewGuid().ToString();
@@ -45,7 +32,9 @@ namespace WpfSplashScreen.ViewModels
                     return;
                 _isGeneralComputing = value;
                 RaisePropertyChanged(() => IsGeneralComputing);
+
                 (ComputeCommand as RelayCommand).RaiseCanExecuteChanged();
+                (AbortComputeCommand as RelayCommand).RaiseCanExecuteChanged();
 
                 IsLocalComputing = value;
             }
@@ -62,6 +51,18 @@ namespace WpfSplashScreen.ViewModels
                     return;
                 _isLocalComputing = value;
                 RaisePropertyChanged(() => IsLocalComputing);
+            }
+        }
+
+        private int _computeProgressValue;
+
+        public int ComputeProgressValue
+        {
+            get { return _computeProgressValue; }
+            set
+            {
+                _computeProgressValue = value;
+                RaisePropertyChanged(() => ComputeProgressValue);
             }
         }
 
@@ -109,6 +110,20 @@ namespace WpfSplashScreen.ViewModels
             }
         }
 
+        private ICommand _abortComputeCommand;
+
+        public ICommand AbortComputeCommand
+        {
+            get
+            {
+                if (_abortComputeCommand == null)
+                {
+                    _abortComputeCommand = new RelayCommand(AbortCompute, CanExecuteAbortCompute);
+                }
+                return _abortComputeCommand;
+            }
+        }
+
         #endregion Commands
 
         public ShellWindowViewModel(Container container, IComputeService computeService)
@@ -116,16 +131,31 @@ namespace WpfSplashScreen.ViewModels
             Container = container;
             ComputeService = computeService;
 
-            MessengerInstance.Register<ComputeEvent>(this, EToken.COMPUTE, (evt) =>
+            ComputeService.OnCompputeCompleted += (s, e) =>
             {
-                IsGeneralComputing = evt.IsComputing;
-                if (evt.InstanceId == _instanceId)
-                    IsLocalComputing = evt.IsComputing;
-                else
-                    IsLocalComputing = false;
-            });
+                Utils.InvokeOnUiThread(() =>
+                {
+                    IsGeneralComputing = false;
+                });
+            };
 
-            IsGeneralComputing = computeService.CanCompute;
+            ComputeService.OnComputeAborted += (s, e) =>
+            {
+                Utils.InvokeOnUiThread(() =>
+                {
+                    IsGeneralComputing = false;
+                });
+            };
+
+            ComputeService.OnCompputeProgressChanged += (s, e) =>
+            {
+                Utils.InvokeOnUiThread(() =>
+                {
+                    ComputeProgressValue = e.ProgressValue;
+                });
+            };
+
+            IsGeneralComputing = computeService.IsComputing;
             IsLocalComputing = false;
         }
 
@@ -152,17 +182,13 @@ namespace WpfSplashScreen.ViewModels
         private void Compute()
         {
             IsGeneralComputing = true;
-            MessengerInstance.Send<ComputeEvent>(new ComputeEvent(IsGeneralComputing, _instanceId), EToken.COMPUTE);
+            ComputeService.Compute(_instanceId);
+        }
 
-            Task.Run(new Action(() =>
-            {
-                Thread.Sleep(6000);
-                Utils.InvokeOnUiThread(() =>
-                {
-                    IsGeneralComputing = false;
-                    MessengerInstance.Send<ComputeEvent>(new ComputeEvent(IsGeneralComputing, _instanceId), EToken.COMPUTE);
-                });
-            }));
+        private void AbortCompute()
+        {
+            if (CanExecuteAbortCompute() == true)
+                ComputeService.AbortCompute();
         }
 
         private void ExitWindowAction()
@@ -173,7 +199,12 @@ namespace WpfSplashScreen.ViewModels
 
         private bool CanExecuteCompute()
         {
-            return (IsGeneralComputing != true);
+            return (ComputeService.IsComputing != true);
+        }
+
+        private bool CanExecuteAbortCompute()
+        {
+            return (ComputeService.IsComputing == true && IsLocalComputing == true);
         }
 
         public bool CanExit()

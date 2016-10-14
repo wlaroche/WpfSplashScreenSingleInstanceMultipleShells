@@ -1,22 +1,22 @@
-﻿using SimpleInjector;
-using SingleInstanceApp;
+﻿using SingleInstanceApp;
 using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Threading;
-using WpfSplashScreen.Infrastructure.Interfaces;
+using WpfSplashScreen.Infrastructure.Interfaces.Services;
+using WpfSplashScreen.Services;
 
 namespace WpfSplashScreen
 {
     public partial class App : Application, ISingleInstance
     {
+        //Set a Unique Identifier for the single Instance Process
         private const string _appUniqueId = "24F19F27-2589-4994-98A4-61AAEBFD6866";
 
         private static AppLoader _appLoader = null;
         private static bool _isFirstInstance = false;
 
-        public Container _container { get; set; }
-        public ILoggingService _loggingService { get; set; }
+        public ILoggingService Logger { get; set; }
 
         [STAThread]
         private static void Main(string[] args)
@@ -39,8 +39,16 @@ namespace WpfSplashScreen
 
         public App()
         {
-            this.InitializeComponent();
+            try
+            {
+                Logger = _appLoader.Logger;
+            }
+            catch (Exception)
+            {
+                Logger = LoggingService.Instance;
+            }
 
+            this.InitializeComponent();
             this.DispatcherUnhandledException += OnDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += OnCurrentDomainUnhandledException;
         }
@@ -62,7 +70,7 @@ namespace WpfSplashScreen
                 return;
             try
             {
-                _loggingService.LogException(ex);
+                Logger.LogException(ex);
                 MessageBox.Show("", "Unhandled Exception", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch
@@ -74,7 +82,7 @@ namespace WpfSplashScreen
             e.Handled = true;
             try
             {
-                _loggingService.LogException(e.Exception);
+                Logger.LogException(e.Exception);
                 MessageBox.Show("", "Unhandled Exception", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             catch

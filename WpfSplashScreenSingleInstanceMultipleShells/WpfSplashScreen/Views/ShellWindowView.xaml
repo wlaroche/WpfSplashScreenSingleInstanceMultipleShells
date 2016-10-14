@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         xmlns:converters="clr-namespace:WpfSplashScreen.Converters"
         Title="{DynamicResource ApplicationName}" HorizontalAlignment="Left"
-        Height="350" Width="525" WindowStartupLocation="CenterScreen">
+        Height="200" Width="500" WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
@@ -49,27 +49,43 @@
             <!--Toolbar-->
             <ToolBarTray DockPanel.Dock="Top" Background="WhiteSmoke" ToolBarTray.IsLocked="True">
                 <ToolBar Background="WhiteSmoke">
-                    <Button Command="Save" ToolTip="Cut selection to Windows Clipboard.">
+
+                    <Button ToolTip="New Windows" Command="{Binding NewWindowCommand}">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="/WpfSplashSCreen;component/Assets/Images/SmallIcon.png" />
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="/WpfSplashSCreen;component/Assets/Images/SmallIcon.png" />
+                                <TextBlock VerticalAlignment="Center" Margin="3,0,0,0">New Shell Window</TextBlock>
+                            </StackPanel>
                         </StackPanel>
                     </Button>
-                    <Button Command="" ToolTip="Cut selection to Windows Clipboard.">
+                    <!--<Button ToolTip="Open">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="/WpfSplashSCreen;component/Assets/Images/SmallIcon.png" />
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="/WpfSplashSCreen;component/Assets/Images/SmallIcon.png" />
+                                <TextBlock VerticalAlignment="Center" Margin="3,0,0,0">Open...</TextBlock>
+                            </StackPanel>
                         </StackPanel>
                     </Button>
-                    <Button Command="" ToolTip="Copy selection to Windows Clipboard.">
+                    <Separator />
+                    <Button ToolTip="Save">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="/WpfSplashSCreen;component/Assets/Images/SmallIcon.png" />
-                            <!--<TextBlock Margin="3,0,0,0">Open Session</TextBlock>-->
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="/WpfSplashSCreen;component/Assets/Images/SmallIcon.png" />
+                                <TextBlock VerticalAlignment="Center" Margin="3,0,0,0">Save</TextBlock>
+                            </StackPanel>
                         </StackPanel>
-                    </Button>
+                    </Button>-->
                     <Separator />
                     <Button Command="{Binding ComputeCommand}" ToolTip="Compute">
                         <StackPanel Orientation="Horizontal">
                             <Image Source="/WpfSplashSCreen;component/Assets/Images/play.png" Height="18" />
                             <TextBlock VerticalAlignment="Center" Margin="3,0,0,0">Compute</TextBlock>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding AbortComputeCommand}" ToolTip="Stop">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/WpfSplashSCreen;component/Assets/Images/stop.png" Height="18" />
+                            <TextBlock VerticalAlignment="Center" Margin="3,0,0,0">Abort</TextBlock>
                         </StackPanel>
                     </Button>
                 </ToolBar>
@@ -92,7 +108,9 @@
                 </StatusBar.ItemsPanel>
                 <StatusBarItem Grid.Column="1">
                     <StackPanel Orientation="Horizontal" Visibility="{Binding IsLocalComputing, Converter={StaticResource BooleanToVisibilityHiddenConverter}}">
-                        <ProgressBar IsIndeterminate="True" Width="100" Height="12" VerticalAlignment="Center" />
+                        <!--<ProgressBar IsIndeterminate="True" Width="100" Height="12" VerticalAlignment="Center" />-->
+                        <ProgressBar IsIndeterminate="False" Value="{Binding ComputeProgressValue}" Minimum="0" Maximum="100" Width="100" Height="12" VerticalAlignment="Center" />
+
                         <TextBlock Text="Computing..." Margin="10,0,5,0" />
                     </StackPanel>
                 </StatusBarItem>

@@ -8,7 +8,7 @@ using System.Windows;
 [assembly: AssemblyTitle("WpfSplashScreen")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("MyCompany")]
+[assembly: AssemblyCompany("SampleCompany")]
 [assembly: AssemblyProduct("WpfSplashScreen")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]

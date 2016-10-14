@@ -2,7 +2,7 @@
 using System;
 using System.Text;
 using WpfSplashScreen.Infrastructure.EventArguments;
-using WpfSplashScreen.Infrastructure.Interfaces;
+using WpfSplashScreen.Infrastructure.Interfaces.Services;
 using WpfSplashScreen.Models.Enums;
 
 namespace WpfSplashScreen.Services

@@ -1,7 +1,7 @@
 ﻿using System;
 using WpfSplashScreen.Infrastructure.EventArguments;
 
-namespace WpfSplashScreen.Infrastructure.Interfaces
+namespace WpfSplashScreen.Infrastructure.Interfaces.Services
 {
     public interface ILoggingService
     {

@@ -8,6 +8,9 @@ using System.Threading;
 using System.Windows;
 using WpfSplashScreen.Helpers;
 using WpfSplashScreen.Infrastructure.Interfaces;
+using WpfSplashScreen.Infrastructure.Interfaces.Services;
+using WpfSplashScreen.Infrastructure.Interfaces.ViewModels;
+using WpfSplashScreen.Infrastructure.Interfaces.Views;
 using WpfSplashScreen.Models.Enums;
 using WpfSplashScreen.Services;
 using WpfSplashScreen.ViewModels;
@@ -15,49 +18,35 @@ using WpfSplashScreen.Views;
 
 namespace WpfSplashScreen
 {
-    public class AppLoader : IDisposable
+    public class AppLoader : IAppLoader, IDisposable
     {
-        //-------------------- Fields --------------------
-        private ILoggingService _loggingService;
+        #region Constructor
 
-        //-------------------- Properties --------------------
-        public FileVersionInfo FileVersionInfo { get; private set; }
-
-        public Container Container { get; private set; }
-        public string ExecutableDirPath { get; private set; }
-        public object DependencyResolver { get; private set; }
-
-        //-------------------- Constructor --------------------
         public AppLoader()
         {
             FileVersionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
 
             //Temporary set the logger
-            _loggingService = LoggingService.Instance;
-            _loggingService.Log("----------");
-            _loggingService.Log("{0} {1} {2} start.", FileVersionInfo.CompanyName,
+            Logger = LoggingService.Instance;
+            Logger.Log("----------");
+            Logger.Log("{0} {1} {2} start.", FileVersionInfo.CompanyName,
                                                       FileVersionInfo.ProductName,
                                                       FileVersionInfo.ProductVersion);
         }
 
-        public void Initialize()
-        {
-            InitializeCulture();
-            InitializeContainer();
-        }
+        #endregion Constructor
+
+        #region IDisposable Implementation
 
         public void Dispose()
         {
-            _loggingService.Log("{0} {1} exit.", FileVersionInfo.CompanyName,
+            Logger.Log("{0} {1} exit.", FileVersionInfo.CompanyName,
                                                       FileVersionInfo.ProductName,
                                                       FileVersionInfo.ProductVersion);
             Container.Dispose();
         }
 
-        public bool CanClose()
-        {
-            return true;
-        }
+        #endregion IDisposable Implementation
 
         private void InitializeCulture()
         {
@@ -66,13 +55,16 @@ namespace WpfSplashScreen
             //English
             Thread.CurrentThread.CurrentCulture = ci;
             Thread.CurrentThread.CurrentUICulture = ci;
-            _loggingService.Log("Culture initialized");
+            Logger.Log("Culture initialized");
         }
 
         private void InitializeContainer()
         {
             // Create the container as usual.
             var container = new Container();
+
+            // Register this isntance in singleton in container
+            container.Register<IAppLoader>(() => this, Lifestyle.Singleton);
 
             // Register your types, for instance:
             container.Register<ILoggingService, LoggingService>(Lifestyle.Singleton);
@@ -88,12 +80,41 @@ namespace WpfSplashScreen
             container.Verify(VerificationOption.VerifyOnly);
             Container = container;
 
-            _loggingService.Log("Container initialized");
+            Logger.Log("Container initialized");
+        }
+
+        private void GenerateNewShellWindow(IList<string> args = null)
+        {
+            Logger.Log("Creating new application instance");
+            var shellWindow = Container.GetInstance<IShellWindowView>();
+            shellWindow.Initialize();
+            (shellWindow as Window).Show();
+
+            if (args != null && args.Count > 0)
+                shellWindow.ViewModel.ProcessArgs(args);
+        }
+
+        #region IAppLoader Implementation
+
+        public ILoggingService Logger { get; private set; }
+
+        public FileVersionInfo FileVersionInfo { get; private set; }
+
+        public Container Container { get; private set; }
+
+        public string ExecutableDirPath { get; private set; }
+
+        public object DependencyResolver { get; private set; }
+
+        public void Initialize()
+        {
+            InitializeCulture();
+            InitializeContainer();
         }
 
         public void RunApplication(bool showSplashScreen, IList<string> args)
         {
-            _loggingService.Log("Running Application");
+            Logger.Log("Running Application");
 
             try
             {
@@ -102,12 +123,12 @@ namespace WpfSplashScreen
                     var app = new App();
 
                     GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<string>(this, EToken.MESSAGEBOX, true, (x) =>
+                    {
+                        Utils.InvokeOnUiThread(() =>
                         {
-                            Utils.InvokeOnUiThread(() =>
-                            {
-                                MessageBox.Show(x);
-                            });
+                            MessageBox.Show(x);
                         });
+                    });
 
                     GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<IList<string>>(this, EToken.NEWSHELL, true, (arguments) =>
                     {
@@ -145,19 +166,15 @@ namespace WpfSplashScreen
             }
             catch (Exception ex)
             {
-                _loggingService.LogErrorException(ex, "Error during RunApplication");
+                Logger.LogErrorException(ex, "Error during RunApplication");
             }
         }
 
-        private void GenerateNewShellWindow(IList<string> args = null)
+        public bool CanClose()
         {
-            _loggingService.Log("Creating new application instance");
-            var shellWindow = Container.GetInstance<IShellWindowView>();
-            shellWindow.Initialize();
-            (shellWindow as Window).Show();
-
-            if (args != null && args.Count > 0)
-                shellWindow.ViewModel.ProcessArgs(args);
+            return true;
         }
+
+        #endregion IAppLoader Implementation
     }
 }

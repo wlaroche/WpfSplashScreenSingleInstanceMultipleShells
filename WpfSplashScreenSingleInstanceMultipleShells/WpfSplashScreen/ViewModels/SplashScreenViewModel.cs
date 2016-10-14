@@ -1,29 +1,40 @@
 ﻿using System;
 using System.Threading.Tasks;
 using WpfSplashScreen.Helpers;
+using WpfSplashScreen.Infrastructure.Interfaces;
+using WpfSplashScreen.Infrastructure.Interfaces.ViewModels;
 
 namespace WpfSplashScreen.ViewModels
 {
-    public interface ISplashScreenViewModel
-    {
-        event EventHandler OnLoadCompeted;
-
-        event EventHandler OnLoadFailed;
-
-        void Initialize();
-
-        bool RequestCancel { get; set; }
-    }
-
     public class SplashScreenViewModel : WpfSplashScreen.ViewModels.ViewModelBase, ISplashScreenViewModel
     {
-        public event EventHandler OnLoadCompeted;
-
-        public event EventHandler OnLoadFailed;
-
         private Random _rd = new Random();
 
-        public bool RequestCancel { get; set; }
+        #region Properties
+
+        private string _appCopyright;
+
+        public string AppCopyright
+        {
+            get { return _appCopyright; }
+            set
+            {
+                _appCopyright = value;
+                RaisePropertyChanged(() => AppCopyright);
+            }
+        }
+
+        private string _appVersion;
+
+        public string AppVersion
+        {
+            get { return _appVersion; }
+            set
+            {
+                _appVersion = value;
+                RaisePropertyChanged(() => AppVersion);
+            }
+        }
 
         private int _progressValue;
 
@@ -37,19 +48,17 @@ namespace WpfSplashScreen.ViewModels
             }
         }
 
-        public SplashScreenViewModel()
+        #endregion Properties
+
+        #region Contstructor
+
+        public SplashScreenViewModel(IAppLoader appLoader)
         {
+            AppVersion = appLoader.FileVersionInfo.ProductVersion;
+            AppCopyright = appLoader.FileVersionInfo.LegalCopyright;
         }
 
-        public void Initialize()
-        {
-            ProgressValue = 0;
-
-            Task.Run(new Action(() =>
-            {
-                LoadData();
-            }));
-        }
+        #endregion Contstructor
 
         private void LoadData()
         {
@@ -57,7 +66,7 @@ namespace WpfSplashScreen.ViewModels
             {
                 while (ProgressValue <= 100 && RequestCancel == false)
                 {
-                    int newValue = _rd.Next(0, 10);
+                    int newValue = _rd.Next(50, 100);
                     Utils.InvokeOnUiThread(new Action(() =>
                     {
                         ProgressValue += newValue;
@@ -85,5 +94,25 @@ namespace WpfSplashScreen.ViewModels
                 }));
             }
         }
+
+        #region ISplashScreenViewModel Implementation
+
+        public event EventHandler OnLoadCompeted;
+
+        public event EventHandler OnLoadFailed;
+
+        public void Initialize()
+        {
+            ProgressValue = 0;
+
+            Task.Run(new Action(() =>
+            {
+                LoadData();
+            }));
+        }
+
+        public bool RequestCancel { get; set; }
+
+        #endregion ISplashScreenViewModel Implementation
     }
 }

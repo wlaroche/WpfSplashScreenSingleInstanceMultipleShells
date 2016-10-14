@@ -33,6 +33,10 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="SimpleInjector, Version=3.2.2.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
+      <HintPath>..\packages\SimpleInjector.3.2.2\lib\net45\SimpleInjector.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -43,8 +47,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventArguments\ComputeProgressEventArgs.cs" />
     <Compile Include="EventArguments\LoggingEventArgs.cs" />
-    <Compile Include="Interfaces\ILoggingService.cs" />
+    <Compile Include="Interfaces\IAppLoader.cs" />
+    <Compile Include="Interfaces\Services\IComputeService.cs" />
+    <Compile Include="Interfaces\Services\ILoggingService.cs" />
+    <Compile Include="Interfaces\ViewModels\IShellWindowViewModel.cs" />
+    <Compile Include="Interfaces\ViewModels\ISplashScreenViewModel.cs" />
+    <Compile Include="Interfaces\Views\ISplashScreenView.cs" />
+    <Compile Include="Interfaces\Views\IShellWindowView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -53,6 +64,10 @@
       <Name>WpfSplashScreen.Models</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

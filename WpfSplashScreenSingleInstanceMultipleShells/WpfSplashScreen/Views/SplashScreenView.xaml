@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:resx="clr-namespace:WpfSplashScreen.Resources.SplashScreen"
         xmlns:local="clr-namespace:WpfSplashScreen"
         mc:Ignorable="d"
         Title="SplashScreen" Height="320" Width="520" ResizeMode="CanMinimize"
@@ -12,9 +13,13 @@
         WindowStartupLocation="CenterScreen" WindowStyle="None" Topmost="False">
 
     <Window.CommandBindings>
-        <CommandBinding Command="{x:Static SystemCommands.CloseWindowCommand}" CanExecute="CommandBinding_CanExecute_1" Executed="CommandBinding_Executed_1" />
+        <!--<CommandBinding Command="{x:Static SystemCommands.CloseWindowCommand}" CanExecute="CommandBinding_CanExecute_1" Executed="CommandBinding_Executed_1" />
         <CommandBinding Command="{x:Static SystemCommands.MaximizeWindowCommand}" CanExecute="CommandBinding_CanExecute_1" Executed="CommandBinding_Executed_2" />
-        <CommandBinding Command="{x:Static SystemCommands.MinimizeWindowCommand}" CanExecute="CommandBinding_CanExecute_1" Executed="CommandBinding_Executed_3" />
+        <CommandBinding Command="{x:Static SystemCommands.MinimizeWindowCommand}" CanExecute="CommandBinding_CanExecute_1" Executed="CommandBinding_Executed_3" />-->
+
+        <CommandBinding Command="{x:Static SystemCommands.CloseWindowCommand}" CanExecute="CommonCommand_CanExecute" Executed="CloseWindowCommand_Executed" />
+        <CommandBinding Command="{x:Static SystemCommands.MaximizeWindowCommand}" CanExecute="CommonCommand_CanExecute" Executed="MaximizeWindowCommand_Executed" />
+        <CommandBinding Command="{x:Static SystemCommands.MinimizeWindowCommand}" CanExecute="CommonCommand_CanExecute" Executed="MinimizeWindowCommand_Executed" />
     </Window.CommandBindings>
 
     <Grid Background="White" Margin="20">
@@ -73,11 +78,11 @@
 
                     <StackPanel Grid.Column="0" VerticalAlignment="Bottom" Margin="0,0,10,0" Background="Transparent">
                         <TextBlock TextWrapping="Wrap" Margin="0,5,0,0"
-                    Text="Sed saepe enim redeo ad Scipionem, cuius omnis sermo erat de amicitia querebatur." FontSize="10" />
+                    Text="{x:Static resx:SplashScreen.AppDescription}" FontSize="10" />
                         <TextBlock TextWrapping="Wrap" Margin="0,5,0,0" FontSize="10"
-                    Text="Copyright ©  2016 - All rights reserved" />
+                    Text="{Binding AppCopyright, FallbackValue='Copyright © XXX 2016'}" />
                         <TextBlock TextWrapping="Wrap" Margin="0,5,0,0" FontSize="10"
-                    Text="Version 1.0.0.0" />
+                    Text="{Binding AppVersion, FallbackValue='Version X.X.X.X'}" />
                     </StackPanel>
                 </Grid>
             </Grid>
