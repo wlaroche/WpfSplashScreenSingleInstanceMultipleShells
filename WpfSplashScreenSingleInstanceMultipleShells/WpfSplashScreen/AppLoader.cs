@@ -22,6 +22,8 @@ namespace WpfSplashScreen
     {
         #region Constructor
 
+        public bool IsAppInitialized { get; set; }
+
         public AppLoader()
         {
             FileVersionInfo = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
@@ -146,6 +148,8 @@ namespace WpfSplashScreen
                         (shellWindow as Window).Show();
 
                         (splash as Window).Close();
+
+                        IsAppInitialized = true;
 
                         if (args != null && args.Count > 0)
                             shellWindow.ViewModel.ProcessArgs(args);
