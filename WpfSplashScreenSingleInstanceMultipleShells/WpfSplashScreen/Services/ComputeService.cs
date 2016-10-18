@@ -14,6 +14,8 @@ namespace WpfSplashScreen.Services
         private Random _rd = new Random();
         private string _currentProcessId;
 
+        public ILoggingService Logger { get; private set; }
+
         public event EventHandler OnCompputeCompleted;
 
         public event EventHandler OnComputeAborted;
@@ -43,8 +45,10 @@ namespace WpfSplashScreen.Services
             }
         }
 
-        public ComputeService()
+        public ComputeService(ILoggingService logger)
         {
+            Logger = logger;
+
             Messenger.Default.Register<ComputeEvent>(this, EToken.COMPUTE, (evt) =>
             {
                 IsComputing = evt.IsComputing;
@@ -53,11 +57,14 @@ namespace WpfSplashScreen.Services
 
         public void AbortCompute()
         {
+            Logger.Log("Aborting compute with process Id '{0}'...", _currentProcessId);
             _requestAbort = true;
         }
 
         public void Compute(string processId)
         {
+            Logger.Log("Start compute with process Id '{0}'.", processId);
+
             _currentProcessId = processId;
             IsComputing = true;
 
@@ -82,12 +89,14 @@ namespace WpfSplashScreen.Services
 
                 if (_requestAbort == true)
                 {
+                    Logger.Log("Compute with process Id '{0}' aborted.", processId);
                     _requestAbort = false;
                     if (OnComputeAborted != null)
                         OnComputeAborted(this, EventArgs.Empty);
                 }
                 else
                 {
+                    Logger.Log("Compute with process Id '{0}' competed.", processId);
                     if (OnCompputeCompleted != null)
                         OnCompputeCompleted(this, EventArgs.Empty);
                 }
