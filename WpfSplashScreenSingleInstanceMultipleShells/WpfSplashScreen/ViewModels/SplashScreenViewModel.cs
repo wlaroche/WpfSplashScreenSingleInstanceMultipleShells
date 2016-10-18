@@ -66,7 +66,7 @@ namespace WpfSplashScreen.ViewModels
             {
                 while (ProgressValue <= 100 && RequestCancel == false)
                 {
-                    int newValue = _rd.Next(50, 100);
+                    int newValue = _rd.Next(0, 15);
                     Utils.InvokeOnUiThread(new Action(() =>
                     {
                         ProgressValue += newValue;

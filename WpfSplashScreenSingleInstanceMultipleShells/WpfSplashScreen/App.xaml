@@ -7,7 +7,7 @@
     <Application.Resources>
         <system:String x:Key="ApplicationName">Wpf Splash Screen Single Instance Multiple Shells</system:String>
 
-        <Color x:Key="AccentColor">#00215E</Color>
+        <Color x:Key="AccentColor">#404040</Color>
 
         <SolidColorBrush x:Key="AccentColorBrush" Color="{StaticResource AccentColor}" />
     </Application.Resources>

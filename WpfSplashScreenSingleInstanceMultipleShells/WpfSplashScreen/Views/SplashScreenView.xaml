@@ -36,7 +36,7 @@
                 </Grid.RowDefinitions>
 
                 <Grid Grid.Row="0" Margin="0,0,0,0">
-                    <Image Source="/Assets/Images/splahscreen.jpg" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill" />
+                    <Image Source="/Assets/Images/binary.jpg" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="UniformToFill" />
                 </Grid>
 
                 <Grid Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Right" MouseDown="Grid_MouseDown">
@@ -74,8 +74,9 @@
                     </Grid.ColumnDefinitions>
 
                     <!--<Image Grid.Column="1" Source="/Assets/Images/logo.jpg" Stretch="Uniform" VerticalAlignment="Center" />-->
-                    <Image Grid.Column="1" Source="/Assets/Images/logo2.png" Stretch="Uniform" Height="60" HorizontalAlignment="Right" VerticalAlignment="Center" />
-
+                    <!--<Image Grid.Column="1" Source="/Assets/Images/logo2.png" Stretch="Uniform" Height="60" HorizontalAlignment="Right" VerticalAlignment="Center" />-->
+                    <Image Grid.Column="1" Source="/Assets/Images/f4kes0ciety_6.png" Stretch="Uniform" Height="30" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                    
                     <StackPanel Grid.Column="0" VerticalAlignment="Bottom" Margin="0,0,10,0" Background="Transparent">
                         <TextBlock TextWrapping="Wrap" Margin="0,5,0,0"
                     Text="{x:Static resx:SplashScreen.AppDescription}" FontSize="10" />
