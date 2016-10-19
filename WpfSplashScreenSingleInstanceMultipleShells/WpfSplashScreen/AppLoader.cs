@@ -20,9 +20,12 @@ namespace WpfSplashScreen
 {
     public class AppLoader : IAppLoader, IDisposable
     {
+        private App _currentApp = null;
+
         #region Constructor
 
-        public bool IsAppInitialized { get; set; }
+        public bool IsAppInitialized { get; private set; }
+        public bool IsAppAlreadyRun { get; private set; }
 
         public AppLoader()
         {
@@ -112,6 +115,13 @@ namespace WpfSplashScreen
         {
             InitializeCulture();
             InitializeContainer();
+            InitializeApp();
+        }
+
+        public void InitializeApp()
+        {
+            if (_currentApp == null)
+                _currentApp = new App();
         }
 
         public void RunApplication(bool showSplashScreen, IList<string> args)
@@ -122,8 +132,6 @@ namespace WpfSplashScreen
             {
                 if (showSplashScreen == true)
                 {
-                    var app = new App();
-
                     GalaSoft.MvvmLight.Messaging.Messenger.Default.Register<string>(this, EToken.MESSAGEBOX, true, (x) =>
                     {
                         Utils.InvokeOnUiThread(() =>
@@ -161,7 +169,12 @@ namespace WpfSplashScreen
 
                     (splash as Window).Show();
                     splash.Initialize();
-                    app.Run((Window)splash);
+
+                    if (IsAppAlreadyRun == false)
+                    {
+                        IsAppAlreadyRun = true;                        
+                        _currentApp.Run(splash as Window);                        
+                    }
                 }
                 else
                 {

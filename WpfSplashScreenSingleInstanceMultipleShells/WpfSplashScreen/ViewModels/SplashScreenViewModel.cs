@@ -71,7 +71,7 @@ namespace WpfSplashScreen.ViewModels
                     {
                         ProgressValue += newValue;
                     }));
-                    System.Threading.Thread.Sleep(300);
+                    System.Threading.Thread.Sleep(500);
 
                     //Test to throw an Exception
                     //throw new Exception("Fake Error !");

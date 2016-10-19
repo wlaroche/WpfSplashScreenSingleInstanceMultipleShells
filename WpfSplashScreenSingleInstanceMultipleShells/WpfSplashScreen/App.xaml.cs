@@ -98,8 +98,6 @@ namespace WpfSplashScreen
                 args.RemoveAt(0);
             }
 
-            bool isAppInitialized = _appLoader.IsAppInitialized;
-
             if (_appLoader.IsAppInitialized == false)
                 return true;
 
