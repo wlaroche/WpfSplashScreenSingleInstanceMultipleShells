@@ -1,1 +1,1 @@
-# WpfSplashScreenSingleInstanceMultipleShells
+# Wpf SplashScreen with Single Instance and Multiple Shells
